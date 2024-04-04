@@ -174,17 +174,17 @@
                 <ul class="navbar-nav">
                     @if (Auth::user()->role == 'admin')
                         <li class="navbar-brand">
-                            <a class="nav-link" href="{{route('admin.course-deposit.index')}}">
+                            <a class="nav-link" href="{{ route('admin.course-deposit.index') }}">
                                 <i class="fas fa-bell text-danger"></i>
-                                <span class="badge-notif">{{$courseDeposit}}</span>
+                                <span class="badge-notif">{{ $courseDeposit }}</span>
                             </a>
                         </li>
                     @elseif(Auth::user()->role == 'teacher')
                         <li class="navbar-brand">
-                        <a class="nav-link" href="{{route('teacher.course-deposit.index')}}">
-                            <i class="fas fa-bell text-danger"></i>
-                            <span class="badge-notif">{{$courseDeposit}}</span>
-                        </a>
+                            <a class="nav-link" href="{{ route('teacher.course-deposit.index') }}">
+                                <i class="fas fa-bell text-danger"></i>
+                                <span class="badge-notif">{{ $courseDeposit }}</span>
+                            </a>
                         </li>
                     @endif
                     <style>
@@ -280,6 +280,15 @@
                         <div class="card rounded bg-primary text-white border-0">
                             <a href="{{ route('admin.reclamations.index') }}" class="text-decoration-none">
                                 <h6 class="card-header text-md text-white">Reclamations</h6>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center mt-4">
+                    <div class="col-6 col-lg-3 py-2">
+                        <div class="card rounded bg-primary text-white border-0">
+                            <a href="{{ route('admin.tuteurs-fixe.index') }}" class="text-decoration-none">
+                                <h6 class="card-header text-md text-white">Tuteurs Fixes</h6>
                             </a>
                         </div>
                     </div>

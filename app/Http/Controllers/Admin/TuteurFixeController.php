@@ -4,29 +4,29 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CourseDeposit;
-use App\Models\PaySlips;
-use App\Models\Pointing;
-use App\Models\User;
-use App\Notifications\NewTeacherNotification;
+use App\Models\TuteurFix;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class TeacherController extends Controller
+class TuteurFixeController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $teachers = User::where('role', 'teacher')->orderBy('created_at', 'desc')->get();
+        $tuteurFixes = TuteurFix::where('state', true)->orderBy('created_at', 'desc')->get();
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
-        return view('Admin.Teachers.index', compact('teachers', 'courseDeposit'));
+        return view('Admin.TuteursFixe.index', compact('tuteurFixes', 'courseDeposit'));
     }
 
     /**
      * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -42,56 +42,54 @@ class TeacherController extends Controller
         }
 
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
-        return view('Admin.Teachers.create', compact('courseDeposit', 'cashInServices'));
+        return view('Admin.TuteursFixe.create', compact('courseDeposit', 'cashInServices'));
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-
         $customMessages = [
             'required' => 'Veuillez remplir ce champ.',
-            'regex' => 'Format de numéro invalide.(ex:77XXXXXX)',
-
+            'regex' => 'Format de numéro invalide.(ex:77 XX XX XX)',
         ];
         $data = $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            'amount' => 'required',
             'phone' => ['required', 'string', 'max:255', 'regex:/^[0-9]{9}$/'],
             'poste' => 'required',
             'reseau' => 'required',
         ], $customMessages);
-        $existingTeacher = User::where('name', $data['name'])
-            ->orWhere('email', $data['email'])
-            ->first();
+        $existingTeacher = TuteurFix::where('name', $data['name'])->first();
         if ($existingTeacher) {
-            $message = 'Un utilisateur avec ce nom ou cette adresse e-mail existe déjà.';
+            $message = 'Un utilisateur avec ce nom existe déjà.';
             $request->session()->flash('error_message', $message);
-            return redirect()->route('admin.teacher.index');
+            return redirect()->route('admin.tuteurs-fixe.index');
         }
-        $password = Hash::make('LesTutorielsTuteurs');
-        $teacher = User::create([
+        $teacher = TuteurFix::create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => $password,
+            'amount' => $data['amount'],
             'phone' => $data['phone'],
-            'role' => 'teacher',
             'poste' => $data['poste'],
             'reseau' => $data['reseau'],
         ]);
-        $teacher->notify(new NewTeacherNotification($teacher));
-        $message = 'Nouveau tuteur enregistré avec succès. Il peut consulter ses emails. ';
+        $message = 'Nouveau tuteur fixe enregistré avec succès. ';
         $request->session()->flash('success_message', $message);
-        return redirect()->route('admin.teacher.index');
+        return redirect()->route('admin.tuteurs-fixe.index');
     }
+
     /**
      * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function show(string $id)
+    public function show($id)
     {
-
         $apiToken = env('DEXCHANGE_API_TOKEN');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiToken,
@@ -102,28 +100,35 @@ class TeacherController extends Controller
                 return Str::endsWith($service['serviceCode'], 'CASHIN');
             });
         }
-        $teacher = User::where('role', 'teacher')->where('id', $id)->first();
-        $pointing = Pointing::all();
+        $teacher = TuteurFix::where('id', $id)->first();
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
-
         if (!$teacher) {
-            $message = 'Enseignant non trouvé.';
+            $message = 'Tuteur non trouvé.';
             $request->session()->flash('error_message', $message);
-            return redirect()->route('admin.teacher.index');
+            return redirect()->route('admin.TuteursFixe.index');
         }
-        return view('Admin.Teachers.show', compact('teacher', 'pointing', 'cashInServices', 'courseDeposit'));
+        return view('Admin.TuteursFixe.show', compact('teacher', 'cashInServices', 'courseDeposit'));
     }
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function edit(string $id)
-    {}
+    public function edit($id)
+    {
+        //
+    }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $customMessages = [
             'required' => 'Veuillez remplir ce champ.',
@@ -131,67 +136,50 @@ class TeacherController extends Controller
         ];
         $data = $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            'amount' => 'required',
             'phone' => ['required', 'string', 'max:255', 'regex:/^[0-9]{9}$/'],
             'poste' => 'required',
             'reseau' => 'required',
         ], $customMessages);
-        $teacher = User::where('role', 'teacher')->find($id);
+        $teacher = TuteurFix::find($id);
         if (!$teacher) {
-            $message = 'Enseignant non trouvé.';
+            $message = 'Tuteur fixe non trouvé.';
             $request->session()->flash('error_message', $message);
 
         } else {
             $teacher->update([
                 'name' => $data['name'],
-                'email' => $data['email'],
+                'amount' => $data['amount'],
                 'phone' => $data['phone'],
                 'poste' => $data['poste'],
                 'reseau' => $data["reseau"],
             ]);
-            $message = 'Tuteur modifié avec succès';
+            $message = 'Tuteur Fixe modifié avec succès';
             $request->session()->flash('success_message', $message);
         }
-        return redirect()->route('admin.teacher.index');
+        return redirect()->route('admin.tuteurs-fixe.index');
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $teacher = User::where('role', 'teacher')->find($id);
+        $teacher = TuteurFix::find($id);
+
         if (!$teacher) {
-            $message = "La suppression a échouée";
-            session()->flash('success_message', $message);
+            $message = 'Tuteur fixe non trouvé.';
+            session()->flash('error_message', $message);
         } else {
-            $pointings = Pointing::where('user_id', $teacher->id)->get();
-            $courseDeposits = CourseDeposit::where('user_id', $teacher->id)->get();
-            $paySlips = PaySlips::where('user_id', $teacher->id)->get();
-            foreach ($pointings as $pointing) {
-                $pointing->delete();
-            }
-
-            foreach ($courseDeposits as $courseDeposit) {
-                $filePath = storage_path('app/' . $courseDeposit->support_file);
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-                $courseDeposit->delete();
-            }
-
-            foreach ($paySlips as $paySlip) {
-                $filePath = storage_path('app/' . $paySlip->file_path);
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-                $paySlip->delete();
-            }
-
             $teacher->delete();
-            $message = "Le tuteur a été supprimé avec success !";
+            $message = 'Tuteur fixe supprimé avec succès.';
             session()->flash('success_message', $message);
         }
-        return redirect()->back();
+
+        return redirect()->route('admin.tuteurs-fixe.index');
     }
+
 }

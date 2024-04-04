@@ -18,11 +18,11 @@
 
         <h3 class="m-4 text-center text-primary">Liste des tuteurs</h3>
         <div class="col-12 col-lg-3 my-4">
-          <a href="{{route('admin.teacher.create')}}" class="btn btn-success col-12 ">
-              <i class="fa fa-plus"></i> Nouveau tuteur
-          </a>
-      </div>
-      
+            <a href="{{ route('admin.teacher.create') }}" class="btn btn-success col-12 ">
+                <i class="fa fa-plus"></i> Nouveau tuteur
+            </a>
+        </div>
+
         <div class="row mt-2">
             <div class="col-lg-12">
                 <div class="table-responsive">
@@ -37,6 +37,7 @@
                                 <th class="text-center">Heures(H)</th>
                                 <th class="text-center">Paie(Francs CFA)</th>
                                 <th class="text-center">Status</th>
+                                <th class="text-center">Reseau</th>
                                 <th class="text-center">Modifier</th>
                                 <th class="text-center">Supprimer</th>
 
@@ -50,7 +51,7 @@
                                     <td class="text-center">{{ $teacher->email }}</td>
                                     <td class="text-center">{{ $teacher->phone }}</td>
                                     <td class="text-center">{{ $teacher->poste }}</td>
-                                    <td class="text-center">{{ $teacher->total_hours  }} </td>
+                                    <td class="text-center">{{ $teacher->total_hours }} </td>
                                     <td class="text-center">{{ $teacher->amount }} </td>
                                     <td class="text-center">
                                         @if ($teacher->state == 1)
@@ -60,10 +61,16 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
+                                        {{ $teacher->reseau ? str_replace(['_', 'CASHIN'], ' ', $teacher->reseau) : '-' }}
+                                    </td>
+
+
+                                    <td class="text-center">
                                         <a href="{{ route('admin.teacher.show', $teacher->id) }}" class="btn btn-primary">
                                             <i class="fas fa-pen"></i>
                                         </a>
                                     </td>
+
                                     <td class="text-center">
                                         <form action="{{ route('admin.teacher.destroy', $teacher->id) }}" method="POST">
                                             @csrf

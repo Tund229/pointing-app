@@ -39,6 +39,7 @@ Route::namespace('App\\Http\\Controllers\\Admin')->prefix('admin')->name('admin.
         'pay-slips' => "PaySlipsController",
         'reclamations' => "ReclamationController",
         'restore-account' => "RestoreAccountController",
+        'tuteurs-fixe' => "TuteurFixeController",
     ]);
 
     Route::post('pointing/{id}/valider', 'PointingController@valider')->name('pointing.valider');

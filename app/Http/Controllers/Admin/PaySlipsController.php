@@ -78,6 +78,7 @@ class PaySlipsController extends Controller
                 'amount' => $user->amount,
                 'month' => $data['month'],
                 'code' => $code, // Stockez le code généré
+                'state' => false
             ]);
     
             // Récupérez les pointages pour l'utilisateur

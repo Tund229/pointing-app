@@ -16,10 +16,10 @@
 
 
 
-        <h3 class="m-4 text-center text-primary">Liste des fiches de paies</h3>
+        <h3 class="m-4 text-center text-primary">Liste des tuteurs Fixes</h3>
         <div class="col-12 col-lg-3 my-4">
-            <a href="{{ route('admin.pay-slips.create') }}" class="btn btn-success col-12 ">
-                <i class="fa fa-plus"></i> Nouvelle Fiche
+            <a href="{{ route('admin.tuteurs-fixe.create') }}" class="btn btn-success col-12 ">
+                <i class="fa fa-plus"></i> Nouveau tuteur fixe
             </a>
         </div>
 
@@ -29,51 +29,42 @@
                     <table class="table" id="dataTable">
                         <thead>
                             <tr class="text-nowrap">
-                                <th class="text-center">Créé le</th>
                                 <th class="text-center">Nom</th>
-                                <th class="text-center">Mois</th>
-                                <th class="text-center">Heures</th>
+                                <th class="text-center">Téléphone</th>
+                                <th class="text-center">Statut</th>
+                                <th class="text-center">Poste</th>
+                                <th class="text-center">Réseau</th>
                                 <th class="text-center">Montant</th>
-                                <th class="text-center">Admin</th>
-                                <th class="text-center">Code</th>
-                                <th class="text-center">Etat</th>
-                                <th class="text-center">Télécharger</th>
+                                <th class="text-center">Modifier</th>
                                 <th class="text-center">Supprimer</th>
-
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($paySlips as $paySlip)
+                            @foreach ($tuteurFixes as $tuteurFixe)
                                 <tr>
-                                    <td class="text-center">{{ $paySlip->created_at }}</td>
-                                    <td class="text-center">{{ $paySlip->user->name }}</td>
-                                    <td class="text-center">{{ $paySlip->month }}</td>
-                                    <td class="text-center">{{ $paySlip->total_hours }}</td>
-                                    <td class="text-center">{{ $paySlip->amount }}</td>
-                                    <td class="text-center">{{ $paySlip->admin->name }}</td>
-                                    <td class="text-center">{{ $paySlip->code }}</td>
+                                    <td class="text-center">{{ $tuteurFixe->name }}</td>
+                                    <td class="text-center">{{ $tuteurFixe->phone }}</td>
                                     <td class="text-center">
-                                        @if ($paySlip->state == 1)
-                                            <span class="badge bg-success text-white">Payé</span>
+                                        @if ($tuteurFixe->state == 1)
+                                            Actif
                                         @else
-                                            <span class="badge bg-danger text-white">Non Payé</span>
+                                            Inactif
                                         @endif
                                     </td>
-                                 
+                                    <td class="text-center">{{ $tuteurFixe->poste }}</td>
                                     <td class="text-center">
-                                        @if ($paySlip->state == 1)
-                                            <a href="{{ route('admin.pay-slips.downloadPaySlips', $paySlip->id) }}"
-                                                class="btn btn-primary">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                        @else
-                                            <button class="btn btn-secondary" disabled>
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                        @endif
+                                        {{ $tuteurFixe->reseau ? str_replace(['_', 'CASHIN'], ' ', $tuteurFixe->reseau) : '-' }}
+                                    </td>
+                                    <td class="text-center">{{ $tuteurFixe->amount }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.tuteurs-fixe.show', $tuteurFixe->id) }}"
+                                            class="btn btn-primary">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
                                     </td>
                                     <td class="text-center">
-                                        <form action="{{ route('admin.pay-slips.destroy', $paySlip->id) }}" method="POST">
+                                        <form action="{{ route('admin.tuteurs-fixe.destroy', $tuteurFixe->id) }}"
+                                            method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" class="btn btn-danger delete-button">
@@ -81,11 +72,11 @@
                                             </button>
                                         </form>
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+
                 </div>
             </div>
         </div>
@@ -96,7 +87,7 @@
         deleteButtons.forEach(button => {
             button.addEventListener('click', () => {
                 Swal.fire({
-                    title: 'Supprimez cette fiche de paie ?',
+                    title: 'Supprimez ce tuteur ?',
                     text: 'Cette action est irréversible.',
                     icon: 'warning',
                     showCancelButton: true,

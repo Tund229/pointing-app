@@ -8,13 +8,15 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('pay_slips', function (Blueprint $table) {
+        Schema::create('fiche_admin_tuteur_fixes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('admin_id');
+            $table->unsignedBigInteger('tuteur_fixe_id')->nullable();
+            $table->unsignedBigInteger('admin_id')->nullable();
             $table->float('amount')->default(0);
             $table->float('total_hours')->default(0);
             $table->string('month')->nullable();
@@ -23,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
             $table->boolean('state')->default(true);
             
-            $table->foreign('user_id')
+            $table->foreign('tuteur_fixe_id')
                 ->references('id')
                 ->on('users')
                 ->where('role', 'teacher'); 
@@ -31,16 +33,17 @@ return new class extends Migration
             $table->foreign('admin_id')
                 ->references('id')
                 ->on('users')
-                ->where('role', 'admin'); 
+                ->where('role', 'admin');
         });
-        
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('pay_slips');
+        Schema::dropIfExists('fiche_admin_tuteur_fixes');
     }
 };

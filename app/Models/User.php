@@ -25,7 +25,8 @@ class User extends Authenticatable
         'poste',
         'role',
         'amount',
-        'total_hours'
+        'total_hours',
+        'reseau'
     ];
 
     /**
