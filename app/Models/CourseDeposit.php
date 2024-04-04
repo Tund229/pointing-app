@@ -36,4 +36,6 @@ class CourseDeposit extends Model
     {
         return $this->belongsTo(Promotion::class, 'promotion_id');
     }
+
+   
 }

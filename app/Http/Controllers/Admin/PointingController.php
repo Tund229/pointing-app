@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Course;
-use App\Models\Pointing;
-use App\Models\Promotion;
-use Illuminate\Http\Request;
-use App\Models\CourseDeposit;
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\CourseDeposit;
+use App\Models\Pointing;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class PointingController extends Controller
 {
@@ -19,8 +18,8 @@ class PointingController extends Controller
     public function index()
     {
         $pointings = Pointing::orderBy('state', 'desc') // Tri par état "en attente" en premier
-        ->orderBy('created_at', 'desc') // Ensuite, triez par date de création (ou un autre critère)
-        ->get();
+            ->orderBy('created_at', 'desc') // Ensuite, triez par date de création (ou un autre critère)
+            ->get();
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
         return view('Admin.Pointing.index', compact('pointings', 'courseDeposit'));
     }
@@ -77,22 +76,18 @@ class PointingController extends Controller
             $message = "La suppression a échouée";
             session()->flash('success_message', $message);
         } else {
-            if($pointing->state == 'validé') {
+            if ($pointing->state == 'validé') {
                 $user = $pointing->user;
                 $startHours = Carbon::parse($pointing->start_time);
                 $endHours = Carbon::parse($pointing->end_time);
                 $difference = $endHours->diff($startHours);
                 $diffHours = $difference->h;
-                $diffMinutes = $difference->i;
-                if($diffMinutes >= 40) {
-                    $amount = ($diffHours * $pointing->course->price_per_hour) + ($pointing->course->price_per_hour / 2);
-                    $diffHours = $diffHours + 1;
-                } else {
-                    $amount = $diffHours * $pointing->course->price_per_hour;
-                }
+                $totalMinutes = ($difference->h * 60) + $difference->i;
+                $nombreDe30Min = floor($totalMinutes / 30);
+                $amount = $nombreDe30Min * $pointing->course->price_per_hour;
                 $user->update([
                     'amount' => $user->amount - $amount,
-                    'total_hours' => $user->total_hours - $diffHours
+                    'total_hours' => $user->total_hours - $diffHours,
                 ]);
                 $pointing->delete();
             } else {
@@ -104,34 +99,24 @@ class PointingController extends Controller
         return redirect()->back();
     }
 
-
     public function valider(Request $request, $id)
     {
+
         $pointing = Pointing::find($id);
         if ($pointing) {
-            if($pointing->state != "validé" ){
-
+            if ($pointing->state != "validé") {
                 $motif = $request->input('reason');
                 $startHours = Carbon::parse($pointing->start_time);
                 $endHours = Carbon::parse($pointing->end_time);
                 $difference = $endHours->diff($startHours);
                 $diffHours = $difference->h;
-                $diffMinutes = $difference->i;
-                if($diffMinutes >= 30 && $diffMinutes < 39) {   
-                    $amount = ($diffHours * $pointing->course->price_per_hour) + ($pointing->course->price_per_hour / 2);
-                    $diffHours = $diffHours;
-                }elseif($diffMinutes >= 39){
-                    $diffHours = $diffHours +1;
-                    $amount = $diffHours * $pointing->course->price_per_hour;
-                }else{
-                    $amount = $diffHours * $pointing->course->price_per_hour;
-                }           
-                // Enregistrer le montant chez le user_id
+                $totalMinutes = ($difference->h * 60) + $difference->i;
+                $nombreDe30Min = floor($totalMinutes / 30);
+                $amount = $nombreDe30Min * $pointing->course->price_per_hour;
                 $user = $pointing->user;
                 $user->amount += $amount;
                 $user->total_hours += $diffHours;
                 $user->save();
-    
                 $pointing->update([
                     'state' => 'validé',
                 ]);
@@ -147,40 +132,32 @@ class PointingController extends Controller
 
     }
 
-
     public function refuser(Request $request, $id)
     {
         $pointing = Pointing::find($id);
-
         if ($pointing) {
             $motif = $request->input('reason');
-
-            // Si l'état est "validé", annuler la validation en soustrayant le montant et les heures
-            if($pointing->state === 'validé') {
+            if ($pointing->state === 'validé') {
                 $user = $pointing->user;
                 $startHours = Carbon::parse($pointing->start_time);
                 $endHours = Carbon::parse($pointing->end_time);
                 $difference = $endHours->diff($startHours);
                 $diffHours = $difference->h;
-                $diffMinutes = $difference->i;
-                if($diffMinutes >= 40) {
-                    $amount = ($diffHours * $pointing->course->price_per_hour) + ($pointing->course->price_per_hour / 2);
-                    $diffHours = $diffHours + 1;
-                } else {
-                    $amount = $diffHours * $pointing->course->price_per_hour;
-                }
+                $totalMinutes = ($difference->h * 60) + $difference->i;
+                $nombreDe30Min = floor($totalMinutes / 30);
+                $amount = $nombreDe30Min * $pointing->course->price_per_hour;
                 $user->update([
                     'amount' => $user->amount - $amount,
-                    'total_hours' => $user->total_hours - $diffHours
+                    'total_hours' => $user->total_hours - $diffHours,
                 ]);
                 $pointing->update([
                     'state' => 'rejeté',
-                    'reason' => $motif
+                    'reason' => $motif,
                 ]);
             } else {
                 $pointing->update([
                     'state' => 'rejeté',
-                    'reason' => $motif
+                    'reason' => $motif,
                 ]);
             }
             $message = 'Pointage rejeté avec succès!';
@@ -191,8 +168,6 @@ class PointingController extends Controller
         }
         return redirect()->route('admin.pointing.index');
     }
-
-
 
     public function deleteAll()
     {

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Course;
-use App\Models\Pointing;
-use Illuminate\Http\Request;
-use App\Models\CourseDeposit;
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\CourseDeposit;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -49,7 +48,7 @@ class CourseController extends Controller
         }
         $teacher = Course::create([
             'name' => $data['name'],
-            'price_per_hour' => $data['price_per_hour']
+            'price_per_hour' => $data['price_per_hour'],
         ]);
         $message = 'Nouvelle matière enregistrée avec succès.';
         $request->session()->flash('success_message', $message);
@@ -64,12 +63,13 @@ class CourseController extends Controller
 
         $course = Course::find($id);
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
+
         if (!$course) {
             $message = 'Matière non trouvée.';
             $request->session()->flash('error_message', $message);
             return redirect()->route('admin.courses.index');
         }
-        return view('Admin.Courses.show', compact('course', compact('courseDeposit')));
+        return view('Admin.Courses.show', compact('course', 'courseDeposit'));
     }
 
     /**
@@ -90,7 +90,7 @@ class CourseController extends Controller
         ];
         $data = $request->validate([
             'name' => 'required',
-            'price_per_hour' => 'required'
+            'price_per_hour' => 'required',
 
         ], $customMessages);
         $course = Course::find($id);
@@ -101,7 +101,7 @@ class CourseController extends Controller
         } else {
             $course->update([
                 'name' => $data['name'],
-                'price_per_hour' => $data['price_per_hour']
+                'price_per_hour' => $data['price_per_hour'],
 
             ]);
             $message = 'Matière modifiée avec succès';
@@ -117,17 +117,21 @@ class CourseController extends Controller
     {
         $course = Course::find($id);
         if (!$course) {
-            $message = "La suppression a échouée";
-            session()->flash('success_message', $message);
-        } else {
-            $pointings = Pointing::where('course_id', $course->id)->get();
-            foreach($pointings as $pointing){
-                $pointing->delete();
-            }
-            $course->delete();
-            $message = "La matière a été supprimée avec success !";
-            session()->flash('success_message', $message);
+            $message = "La suppression a échoué";
+            session()->flash('error_message', $message);
+            return redirect()->back();
         }
+
+        $course->courseDeposits()->delete();
+
+        $course->pointings()->delete();
+
+        $course->delete();
+
+        $message = "La matière a été supprimée avec succès !";
+        session()->flash('success_message', $message);
+
         return redirect()->back();
     }
+
 }

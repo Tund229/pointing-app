@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use App\Models\User;
 use App\Models\Course;
 use App\Models\Promotion;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Pointing extends Model
 {
@@ -21,10 +21,9 @@ class Pointing extends Model
         'state',
         'user_id',
         'comment',
-        'reason'
+        'reason',
 
     ];
-
 
     // Relation avec l'utilisateur
     public function user()
@@ -48,13 +47,17 @@ class Pointing extends Model
     {
         $start = Carbon::parse($this->start_time);
         $end = Carbon::parse($this->end_time);
-        return $end->diffInHours($start);
+        $difference =  $end->diff($start);
+        $diffHours = $difference->h;
+        $totalMinutes = ($difference->h * 60) + $difference->i;
+        $nombreDe30Min = floor($totalMinutes / 30);
+        return $nombreDe30Min;
     }
 
     public function price_per_hour()
     {
         if ($this->course) {
-            return $this->course->price_per_hour ;
+            return $this->course->price_per_hour;
         }
         return 0;
     }

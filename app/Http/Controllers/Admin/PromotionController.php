@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
+use App\Models\CourseDeposit;
 use App\Models\Pointing;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
-use App\Models\CourseDeposit;
-use App\Http\Controllers\Controller;
 
 class PromotionController extends Controller
 {
@@ -15,7 +15,7 @@ class PromotionController extends Controller
      */
     public function index()
     {
-        
+
         $courses = Promotion::all();
         $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
         return view('Admin.Promotions.index', compact('courses', 'courseDeposit'));
@@ -92,8 +92,8 @@ class PromotionController extends Controller
         if (!$promotion) {
             $message = 'Promotion non trouvée.';
             $request->session()->flash('error_message', $message);
-           
-        }else{
+
+        } else {
             $promotion->update([
                 'name' => $data['name'],
             ]);
@@ -110,17 +110,22 @@ class PromotionController extends Controller
     {
         $promotion = Promotion::find($id);
         if (!$promotion) {
-            $message = "La suppression a échouée";
+            $message = "La suppression a échoué";
             session()->flash('success_message', $message);
         } else {
-            $pointings = Pointing::where('course_id', $promotion->id)->get();
-            foreach($pointings as $pointing){
+            $pointings = Pointing::where('promotion_id', $promotion->id)->get();
+            foreach ($pointings as $pointing) {
                 $pointing->delete();
             }
+
+            $promotion->courseDeposits()->delete();
+
             $promotion->delete();
-            $message = "La promotion a été supprimée avec success !";
+
+            $message = "La promotion a été supprimée avec succès !";
             session()->flash('success_message', $message);
         }
         return redirect()->back();
     }
+
 }

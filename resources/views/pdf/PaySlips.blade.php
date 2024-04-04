@@ -62,7 +62,7 @@
                                                         <td>
                                                             {{$pointing->course_date}}
                                                         </td>
-                                                        <td>{{$pointing->diffInHours(   )}}</td>
+                                                        <td>{{$pointing->diffInHours() / 2 }}</td>
                                                         <td>{{$pointing->price_per_hour() * $pointing->diffInHours()}}</td>
                                                         <td>{{$pointing->course->name}}</td>
                                                         <td>{{$pointing->promotion->name}}</td>

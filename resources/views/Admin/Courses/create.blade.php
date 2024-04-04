@@ -25,7 +25,7 @@
                             </div>
 
                             <div class="col-sm-6  mb-4">
-                                <label class="control-label">Prix par heure</label>
+                                <label class="control-label">Prix par 30min</label>
                                 <input type="number" class="form-control" name="price_per_hour">
                                 @error('price_per_hour')
                                     <div class="text-danger text-center f-w-400">{{ $message }}</div>

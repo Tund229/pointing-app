@@ -18,11 +18,11 @@
 
         <h3 class="m-4 text-center text-primary">Liste des matières</h3>
         <div class="col-12 col-lg-3 my-4">
-          <a href="{{route('admin.courses.create')}}" class="btn btn-success col-12 ">
-              <i class="fa fa-plus"></i> Nouvelle matière
-          </a>
-      </div>
-      
+            <a href="{{ route('admin.courses.create') }}" class="btn btn-success col-12 ">
+                <i class="fa fa-plus"></i> Nouvelle matière
+            </a>
+        </div>
+
         <div class="row mt-2">
             <div class="col-lg-12">
                 <div class="table-responsive">
@@ -31,7 +31,7 @@
                             <tr class="text-nowrap">
                                 <th class="text-center">Créé le</th>
                                 <th class="text-center">Nom</th>
-                                <th class="text-center">Prix</th>
+                                <th class="text-center">Prix(30min)</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Modifier</th>
                                 <th class="text-center">Supprimer</th>

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -17,7 +17,17 @@ class Course extends Model
     protected $fillable = [
         'name',
         'state',
-        'price_per_hour'
-       
+        'price_per_hour',
+
     ];
+
+    public function courseDeposits()
+    {
+        return $this->hasMany(CourseDeposit::class);
+    }
+
+    public function pointings()
+    {
+        return $this->hasMany(Pointing::class);
+    }
 }
