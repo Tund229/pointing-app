@@ -31,6 +31,7 @@
                                         <img src="{{ public_path('img/paye.png') }}" width="100px"
                                             alt="Description de l'image" style="display: inline-block;">
                                     </div>
+
                                 </div>
                                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                                     <div class="invoice-details">
@@ -51,26 +52,19 @@
                                         <table class="table custom-table m-0">
                                             <thead>
                                                 <tr>
-                                                    <th scope="">Date du cours</th>
-                                                    <th scope="col">Heure totale(Francs CFA)</th>
-                                                    <th scope="col">Montant total(H)</th>
-                                                    <th scope="col">Matière</th>
-                                                    <th scope="col">Promotion</th>
+                                                    <th scope="col" colspan="4">Montant total</th>
+                                                    <th scope="col">Etat</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($pointings as $pointing)
-                                                    <tr class="{{ $paySlip->state ? 'paid-row' : '' }}">
-                                                        <td>
-                                                            {{ $pointing->course_date }}
-                                                        </td>
-                                                        <td>{{ $pointing->diffInHours() / 2 }}</td>
-                                                        <td>{{ $pointing->price_per_hour() * $pointing->diffInHours() }}
-                                                        </td>
-                                                        <td>{{ $pointing->course->name }}</td>
-                                                        <td>{{ $pointing->promotion->name }}</td>
-                                                    </tr>
-                                                @endforeach
+                                                <tr>
+                                                    <td colspan="4">
+                                                        {{ $paySlip->amount }}
+                                                    </td>
+                                                    <td>
+                                                        Payé
+                                                    </td>
+                                                </tr>
                                                 <tr>
                                                     <td colspan="4">
                                                         <h5 class="text-success"><strong>Grand Total</strong></h5>
@@ -103,13 +97,6 @@
     </div>
 </div>
 <style>
-    .paid-row {
-        background-image: url('https://t3.ftcdn.net/jpg/01/28/86/92/360_F_128869299_6CBgBjT3tbcGJ3ewVQfABpUdvAEG5nv2.jpg');
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
-
     td {
         padding: 20px;
     }

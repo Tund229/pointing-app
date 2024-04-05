@@ -35,6 +35,8 @@
                                 <th class="text-center">Téléphone</th>
                                 <th class="text-center">Poste</th>
                                 <th class="text-center">Status</th>
+                                <th class="text-center">Montant</th>
+                                <th class="text-center">Reseau</th>
                                 <th class="text-center">Modifier</th>
                                 <th class="text-center">Supprimer</th>
 
@@ -54,6 +56,10 @@
                                         @elseif($admin->state == 0)
                                             <span class="badge bg-danger text-white">Inactif</span>
                                         @endif
+                                    </td>
+                                    <td class="text-center">{{ $admin->amount ?? "-" }} </td>
+                                    <td class="text-center">
+                                        {{ $admin->reseau ? str_replace(['_', 'CASHIN'], ' ', $admin->reseau) : '-' }}
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('admin.admin.show', $admin->id) }}" class="btn btn-primary">

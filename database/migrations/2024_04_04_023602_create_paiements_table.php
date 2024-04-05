@@ -38,10 +38,17 @@ return new class extends Migration
                 ->references('id')
                 ->on('pay_slips')
                 ->onDelete('cascade');
+
             $table->unsignedBigInteger('pay_slip_admin_id')->nullable();
             $table->foreign('pay_slip_admin_id')
                 ->references('id')
                 ->on('fiche_admin_tuteur_fixes')
+                ->onDelete('cascade');
+
+            $table->unsignedBigInteger('tuteur_fixe_id')->nullable();
+            $table->foreign('tuteur_fixe_id')
+                ->references('id')
+                ->on('tuteur_fixes')
                 ->onDelete('cascade');
         });
     }

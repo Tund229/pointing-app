@@ -191,4 +191,47 @@ class HomeController extends Controller
             return redirect()->back();
         }
     }
+
+
+    public function handleCallback(Request $request)
+    {
+        // Récupérer les données envoyées via la route /callback
+        $data = $request->all();
+
+        // Afficher les données dans les logs
+        Log::info('Callback data: ' . json_encode($data));
+
+        // Vous pouvez effectuer d'autres opérations avec les données ici
+
+        // Retourner une réponse si nécessaire
+        // return response()->json(['message' => 'Callback handled successfully']);
+    }
+
+    public function handleSuccess(Request $request)
+    {
+        // Récupérer les données envoyées via la route /success
+        $data = $request->all();
+
+        // Afficher les données dans les logs
+        Log::info('Success data: ' . json_encode($data));
+
+        // Vous pouvez effectuer d'autres opérations avec les données ici
+
+        // Retourner une réponse si nécessaire
+        // return response()->json(['message' => 'Success handled successfully']);
+    }
+
+    public function handleFailure(Request $request)
+    {
+        // Récupérer les données envoyées via la route /failure
+        $data = $request->all();
+
+        // Afficher les données dans les logs
+        Log::info('Failure data: ' . json_encode($data));
+
+        // Vous pouvez effectuer d'autres opérations avec les données ici
+
+        // Retourner une réponse si nécessaire
+        // return response()->json(['message' => 'Failure handled successfully']);
+    }
 }

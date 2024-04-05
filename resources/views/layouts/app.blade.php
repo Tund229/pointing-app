@@ -288,7 +288,14 @@
                     <div class="col-6 col-lg-3 py-2">
                         <div class="card rounded bg-primary text-white border-0">
                             <a href="{{ route('admin.tuteurs-fixe.index') }}" class="text-decoration-none">
-                                <h6 class="card-header text-md text-white">Tuteurs Fixes</h6>
+                                <h6 class="card-header text-md text-white">Employés Fixes</h6>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3 py-2">
+                        <div class="card rounded bg-primary text-white border-0">
+                            <a href="{{ route('admin.paiements.index') }}" class="text-decoration-none">
+                                <h6 class="card-header text-md text-white">Paiements</h6>
                             </a>
                         </div>
                     </div>

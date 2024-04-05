@@ -34,7 +34,7 @@
                     </div>
                     <div class="form-group mt-4">
                         <div class="row">
-                            <div class="col-sm-6 mb-4">
+                            <div class="col-sm-4 mb-4">
                                 <label class="control-label">Téléphone</label>
                                 <input type="tel" class="form-control" name="phone" value="{{ $teacher->phone }}">
                                 @error('phone')
@@ -42,7 +42,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-sm-6 ">
+                            <div class="col-sm-4 ">
                                 <label class="control-label">Poste</label>
                                 <input type="text" class="form-control" name="poste" value="{{ $teacher->poste }}">
                                 @error('poste')
@@ -50,13 +50,8 @@
                                 @enderror
                             </div>
 
-                        </div>
-                    </div>
 
-
-                    <div class="form-group mt-4">
-                        <div class="row">
-                            <div class="col-sm-6 mb-4">
+                            <div class="col-sm-4 mb-4">
                                 <label class="control-label">Reseau</label>
                                 <select name="reseau" id="reseau" class="form-control  shadow-none">
                                     <option value="">Sélectionnez un reseau</option>
@@ -73,8 +68,12 @@
                                     <div class="text-danger text-center f-w-400">{{ $message }}</div>
                                 @enderror
                             </div>
+
                         </div>
                     </div>
+
+
+                   
 
                     <div class="form-group mt-2">
                         <div class="row">

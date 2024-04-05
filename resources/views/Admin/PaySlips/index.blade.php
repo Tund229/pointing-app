@@ -13,10 +13,7 @@
                 {{ session('success_message') }}
             </div>
         @endif
-
-
-
-        <h3 class="m-4 text-center text-primary">Liste des fiches de paies</h3>
+        <h3 class="m-4 text-center text-primary">Liste des fiches de paies des tuteurs</h3>
         <div class="col-12 col-lg-3 my-4">
             <a href="{{ route('admin.pay-slips.create') }}" class="btn btn-success col-12 ">
                 <i class="fa fa-plus"></i> Nouvelle Fiche
@@ -39,6 +36,7 @@
                                 <th class="text-center">Etat</th>
                                 <th class="text-center">Télécharger</th>
                                 <th class="text-center">Supprimer</th>
+                                <th class="text-center">Details</th>
 
                             </tr>
                         </thead>
@@ -59,18 +57,12 @@
                                             <span class="badge bg-danger text-white">Non Payé</span>
                                         @endif
                                     </td>
-                                 
+
                                     <td class="text-center">
-                                        @if ($paySlip->state == 1)
-                                            <a href="{{ route('admin.pay-slips.downloadPaySlips', $paySlip->id) }}"
-                                                class="btn btn-primary">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                        @else
-                                            <button class="btn btn-secondary" disabled>
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                        @endif
+                                        <a href="{{ route('admin.pay-slips.downloadPaySlips', $paySlip->id) }}"
+                                            class="btn btn-primary">
+                                            <i class="fas fa-download"></i>
+                                        </a>
                                     </td>
                                     <td class="text-center">
                                         <form action="{{ route('admin.pay-slips.destroy', $paySlip->id) }}" method="POST">
@@ -81,6 +73,19 @@
                                             </button>
                                         </form>
                                     </td>
+                                    <td class="text-center">
+                                        @if ($paySlip->state == 1)
+                                            <a href="{{ route('admin.pay-slips.show', $paySlip->id) }}"
+                                                class="btn btn-primary">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        @else
+                                            <button class="btn btn-secondary" disabled>
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+
 
                                 </tr>
                             @endforeach

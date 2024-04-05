@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use App\Models\Course;
 use App\Models\Promotion;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PaySlips extends Model
 {
@@ -20,9 +20,8 @@ class PaySlips extends Model
         'state',
         'month',
         'total_hours',
-        'code'
+        'code',
     ];
-
 
     // Relation avec l'utilisateur
     public function user()
@@ -46,4 +45,10 @@ class PaySlips extends Model
     {
         return $this->belongsTo(Promotion::class, 'promotion_id');
     }
+
+    public function paiment()
+    {
+        return $this->hasOne(Paiement::class);
+    }
+
 }

@@ -65,7 +65,16 @@ class ReclamationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $reclamation = Reclamation::find($id);
+        if (!$reclamation) {
+            $message = "La suppression a échouée";
+            session()->flash('success_message', $message);
+        } else {
+            $reclamation->delete();
+            $message = "La reclamation a été supprimé avec success !";
+            session()->flash('success_message', $message);
+        }
+        return redirect()->back();
     }
 
 
