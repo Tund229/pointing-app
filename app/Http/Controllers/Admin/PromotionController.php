@@ -66,7 +66,8 @@ class PromotionController extends Controller
             $request->session()->flash('error_message', $message);
             return redirect()->route('admin.promotion.index');
         }
-        return view('Admin.Promotions.show', compact('promotion'));
+        $courseDeposit = CourseDeposit::where('state', 'en attente')->count();
+        return view('Admin.Promotions.show', compact('promotion', 'courseDeposit'));
     }
 
     /**

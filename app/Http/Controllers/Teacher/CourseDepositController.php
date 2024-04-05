@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Models\Course;
 use App\Models\Promotion;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CourseDeposit;
 use App\Http\Controllers\Controller;
@@ -71,7 +72,8 @@ class CourseDepositController extends Controller
         $course = Course::findOrFail($data['course_id']); // Récupérer la matière
         $promotion = Promotion::findOrFail($data['promotion_id']); // Récupérer la promotion
         $user = Auth::user();
-        $fileName = $user->name . '_' . $course->name . '_' . $promotion->name . '.' . $request->file('support_file')->getClientOriginalExtension();
+        $code = Str::random(6);
+        $fileName = $user->name . '_' . $course->name . '_'.$code.'_'. $promotion->name . '.' . $request->file('support_file')->getClientOriginalExtension();
         $filePath = $request->file('support_file')->storeAs('public/Fichiers', $fileName);
         $teacher = CourseDeposit::create([
             'user_id' => $user->id,
