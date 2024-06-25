@@ -69,63 +69,79 @@ class PaiementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'pay_slip_id' => 'required|exists:pay_slips,id',
-        ]);
-        $apiToken = env('DEXCHANGE_API_TOKEN');
-        $paySlipId = $request->pay_slip_id;
-        $paySlip = PaySlips::findOrFail($paySlipId);
-        $user = $paySlip->user;
-        $externalTransactionId = Str::uuid();
-        $payload = [
-            'amount' => abs($paySlip->amount),
-            'serviceCode' => $user->reseau,
-            'callBackURL' => 'https://academy-tutoriels.com/callback',
-            'externalTransactionId' => $externalTransactionId,
-            'failureUrl' => 'https://academy-tutoriels.com/',
-            'successUrl' => 'https://academy-tutoriels.com/',
-            'number' => $user->phone,
-        ];
+{
+    $request->validate([
+        'pay_slip_id' => 'required|exists:pay_slips,id',
+    ]);
+
+    $apiToken = env('DEXCHANGE_API_TOKEN');
+    $paySlipId = $request->pay_slip_id;
+    $paySlip = PaySlips::findOrFail($paySlipId);
+    $user = $paySlip->user;
+    $externalTransactionId = Str::uuid();
+    $payload = [
+        'amount' => abs($paySlip->amount),
+        'serviceCode' => $user->reseau,
+        'callBackURL' => 'https://academy-tutoriels.com/callback',
+        'externalTransactionId' => $externalTransactionId,
+        'failureUrl' => 'https://academy-tutoriels.com/',
+        'successUrl' => 'https://academy-tutoriels.com/',
+        'number' => $user->phone,
+    ];
+
+    try {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiToken,
         ])->post('https://api-m.dexchange.sn/api/v1/transaction/init', $payload);
         $responseData = $response->json();
-        if (isset($responseData['transaction']) && $responseData['transaction']['success']) {
+    } catch (\Exception $e) {
+        session()->flash('error_message', 'Erreur lors de l\'initialisation de la transaction. Veuillez réessayer plus tard.');
+        return redirect()->route('admin.paiements.index');
+    }
+
+    if (isset($responseData['transaction']) && $responseData['transaction']['success']) {
+        try {
             $transactionId = $responseData['transaction']['transactionId'];
             $response = Http::get("https://api-m.dexchange.sn/api/v1/transaction/{$transactionId}");
-            $paiementData = [
-                'phone' => $user->phone,
-                'amount' => abs($user->amount),
-                'externalTransactionId' => $externalTransactionId,
-                'status' => $responseData['transaction']['Status'],
-                'success' => $responseData['transaction']['success'],
-                'transactionFee' => $responseData['transaction']['transactionFee'],
-                'transactionCommission' => $responseData['transaction']['transactionCommission'],
-                'transactionId' => $responseData['transaction']['transactionId'],
-                'transactionType' => $responseData['transaction']['transactionType'],
-                'previousBalance' => $responseData['transaction']['previousBalance'],
-                'currentBalance' => $responseData['transaction']['currentBalance'],
-                'user_id' => $user->id,
-                'paye_by' => auth()->id(),
-                'pay_slip_id' => $paySlip->id,
-            ];
-            Paiement::create($paiementData);
-            $paySlip->update(['state' => true]);
-            $successMessage = "La fiche de paie a été payée avec succès.";
-            session()->flash('success_message', $successMessage);
-            return redirect()->route('admin.paiements.index');
-        } else {
-            $errorMessage = $responseData['transaction']['message'];
-            if ($errorMessage === "Request invalid") {
-                $errorMessage = "Le paiement de la fiche a échoué";
-            } else {
-                $errorMessage = "Une erreur est survenue lors du paiement de la fiche de paie";
-            }
-            session()->flash('error_message', $errorMessage);
+            $transactionDetails = $response->json();
+        } catch (\Exception $e) {
+            session()->flash('error_message', 'Erreur lors de la récupération des détails de la transaction. Veuillez réessayer plus tard.');
             return redirect()->route('admin.paiements.index');
         }
+
+        $paiementData = [
+            'phone' => $user->phone,
+            'amount' => abs($paySlip->amount),
+            'externalTransactionId' => $externalTransactionId,
+            'status' => $transactionDetails['transaction']['Status'],
+            'success' => $transactionDetails['transaction']['success'],
+            'transactionFee' => $transactionDetails['transaction']['transactionFee'],
+            'transactionCommission' => $transactionDetails['transaction']['transactionCommission'],
+            'transactionId' => $transactionDetails['transaction']['transactionId'],
+            'transactionType' => $transactionDetails['transaction']['transactionType'],
+            'previousBalance' => $transactionDetails['transaction']['previousBalance'],
+            'currentBalance' => $transactionDetails['transaction']['currentBalance'],
+            'user_id' => $user->id,
+            'paye_by' => auth()->id(),
+            'pay_slip_id' => $paySlip->id,
+        ];
+
+        Paiement::create($paiementData);
+        $paySlip->update(['state' => true]);
+
+        $successMessage = "La fiche de paie a été payée avec succès.";
+        session()->flash('success_message', $successMessage);
+        return redirect()->route('admin.paiements.index');
+    } else {
+        $errorMessage = $responseData['transaction']['message'] ?? 'Une erreur est survenue lors du paiement de la fiche de paie';
+        if ($errorMessage === "Request invalid") {
+            $errorMessage = "Le paiement de la fiche a échoué.";
+        }
+        session()->flash('error_message', $errorMessage);
+        return redirect()->route('admin.paiements.index');
     }
+}
+
 
     /**
      * Display the specified resource.
